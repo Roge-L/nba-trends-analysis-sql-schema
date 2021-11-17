@@ -1,0 +1,21 @@
+Example Interaction with the postgreSQL shell:
+
+1. \i schema.ddl
+
+2. \i sample-data.sql (or run python prog to bring in data)
+
+3. SELECT count(*) FROM Player;
+
+4. SELECT count(*) FROM Team;
+
+5. SELECT count(*) FROM Shot;
+
+6. SELECT count(*) FROM Game;
+
+7. EXAMPLE QUERY FOR Player;
+
+4. EXAMPLE QUERY FOR Team;
+
+5. EXAMPLE QUERY FOR Shot;
+
+6. EXAMPLE QUERY FOR Game;

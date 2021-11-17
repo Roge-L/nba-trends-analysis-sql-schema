@@ -1,0 +1,56 @@
+DROP SCHEMA IF EXISTS PhaseTwo CASCADE;
+CREATE SCHEMA PhaseTwo;
+SET search_path TO PhaseTwo;
+
+CREATE TABLE Player (
+    playerID INT NOT NULL, 
+    teamID INT NOT NULL, 
+    year INT NOT NULL, 
+    GP INT NOT NULL, 
+    PTS FLOAT NOT NULL, 
+    FGA FLOAT NOT NULL, 
+    FGM FLOAT NOT NULL, 
+    FG% FLOAT NOT NULL, 
+    eFG% FLOAT NOT NULL, 
+    3PTA FLOAT NOT NULL, 
+    3PTM FLOAT NOT NULL, 
+    3PT% FLOAT NOT NULL, 
+    FTA FLOAT NOT NULL,
+    FTM FLOAT NOT NULL, 
+    FT% FLOAT NOT NULL, 
+    AST FLOAT NOT NULL, 
+    REB FLOAT NOT NULL, 
+    STL FLOAT NOT NULL, 
+    BLK FLOAT NOT NULL, 
+    TOV FLOAT NOT NULL, 
+    PF FLOAT NOT NULL,
+    PRIMARY KEY (playerID),
+    FOREIGN KEY (teamID) REFERENCES Team(teamID)
+);
+
+CREATE TABLE Team (
+    teamID INT NOT NULL, 
+    teamName TEXT NOT NULL,
+    PRIMARY KEY (teamID)
+);
+
+CREATE TABLE Shot (
+    shotID INT NOT NULL, 
+    playerID INT NOT NULL,
+    shotDistance FLOAT NOT NULL,
+    gameID INT NOT NULL, 
+    clutchTime BOOLEAN NOT NULL,
+    shotResult BOOLEAN NOT NULL,
+    PRIMARY KEY (shotID),
+    FOREIGN KEY (playerID) REFERENCES Player(playerID)
+);
+
+-- READ TA COMMENTS ON POTENTIAL IMPROVEMENTS FOR
+-- KEYS FOR THIS RELATION
+CREATE TABLE Game (
+    gameID INT NOT NULL,
+    teamID INT NOT NULL, 
+    oppTeamID INT NOT NULL, 
+    homeScore INT NOT NULL, 
+    awayScore INT NOT NULL
+)
