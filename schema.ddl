@@ -7,18 +7,18 @@ CREATE TABLE Player (
     playerID INT NOT NULL,
     playerName TEXT NOT NULL, 
     teamID INT NOT NULL, 
-    year INT NOT NULL, 
+    year TEXT NOT NULL, 
     GP INT NOT NULL, 
     PTS FLOAT NOT NULL, 
-    FGA FLOAT NOT NULL, 
-    FGM FLOAT NOT NULL, 
+    FGA INT NOT NULL, 
+    FGM INT NOT NULL, 
     FG% FLOAT NOT NULL, 
     eFG% FLOAT NOT NULL, 
-    3PTA FLOAT NOT NULL, 
-    3PTM FLOAT NOT NULL, 
+    3PTA INT NOT NULL, 
+    3PTM INT NOT NULL, 
     3PT% FLOAT NOT NULL, 
-    FTA FLOAT NOT NULL,
-    FTM FLOAT NOT NULL, 
+    FTA INT NOT NULL,
+    FTM INT NOT NULL, 
     FT% FLOAT NOT NULL, 
     AST FLOAT NOT NULL, 
     REB FLOAT NOT NULL, 
@@ -26,7 +26,7 @@ CREATE TABLE Player (
     BLK FLOAT NOT NULL, 
     TOV FLOAT NOT NULL, 
     PF FLOAT NOT NULL,
-    PRIMARY KEY (playerID),
+    PRIMARY KEY (playerID, teamID, year),
     FOREIGN KEY (teamID) REFERENCES Team(teamID)
 );
 
@@ -39,12 +39,13 @@ CREATE TABLE Team (
 CREATE TABLE Shot (
     shotID INT NOT NULL, 
     playerID INT NOT NULL,
-    shotDistance FLOAT NOT NULL,
+    shotDistance INT NOT NULL,
     gameID INT NOT NULL, 
     clutchTime BOOLEAN NOT NULL,
     shotResult BOOLEAN NOT NULL,
     PRIMARY KEY (shotID),
-    FOREIGN KEY (playerID) REFERENCES Player(playerID)
+    FOREIGN KEY (playerID) REFERENCES Player(playerID),
+    FOREIGN KEY (gameID) REFERENCES Game(gameID)
 );
 
 -- READ TA COMMENTS ON POTENTIAL IMPROVEMENTS FOR
@@ -54,5 +55,7 @@ CREATE TABLE Game (
     teamID INT NOT NULL, 
     oppTeamID INT NOT NULL, 
     homeScore INT NOT NULL, 
-    awayScore INT NOT NULL
+    awayScore INT NOT NULL,
+    PRIMARY KEY (gameID),
+    FOREIGN KEY (teamID, oppTeamID) REFERENCES Team(teamID)
 )
