@@ -5,6 +5,7 @@ from nba_api.stats.static import players, teams
 from nba_api.stats.endpoints.leaguedashplayerstats import LeagueDashPlayerStats
 from nba_api.stats.endpoints.shotchartdetail import ShotChartDetail
 from nba_api.stats.endpoints.leaguegamefinder import LeagueGameFinder
+from nba_api.stats.endpoints.boxscorematchups import BoxScoreMatchups
 
 # https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/cumestatsplayer.md [PLAYER]
 # https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/cumestatsteam.md [TEAM]
@@ -147,6 +148,29 @@ class NBA:
       time.sleep(0.5)
 
 
+  def get_games(self):
+    target_seasons = [
+      "2020-21", "2019-20", "2018-19", "2017-18", "2016-17",
+      "2015-16", "2014-15", "2013-14", "2012-13", "2011-12" 
+    ]
+    res = LeagueGameFinder(season_nullable=','.join(target_seasons))
+    games = res.get_data_frames()[0].to_dict(orient='records')
+    print(len(games))
+    data = []
+    for i in range(int(len(games) / 2)):
+      home = games[i * 2]
+      away = games[i * 2 + 1]
+      dct = {
+        'gameID': home['GAME_ID'],
+        'teamID': home['TEAM_ID'],
+        'oppTeamID': away['TEAM_ID'],
+        'homeScore': home['PTS'],
+        'awaySdore': away['PTS']
+      }
+      data.append(dct)
+    export_csv(data, 'Game.csv')
+      
+
 def rm(path):
   try:
     os.remove(path)
@@ -156,13 +180,14 @@ def rm(path):
 
 
 def generate_all():
-  rm('./Player.csv')
-  rm('./Team.csv')
-  rm('./Shot(0-500).csv')
-  rm('./Shot(500-1000).csv')
-  rm('./Shot(1000-1500).csv')
-  rm('./Shot(1500-2000).csv')
-  rm('./Shot(2000-2863).csv')
+  # rm('./Player.csv')
+  # rm('./Team.csv')
+  # rm('./Shot(0-500).csv')
+  # rm('./Shot(500-1000).csv')
+  # rm('./Shot(1000-1500).csv')
+  # rm('./Shot(1500-2000).csv')
+  # rm('./Shot(2000-2863).csv')
+  # rm('./Game.csv)
 
   nba = NBA()
   nba.get_player_stats()
@@ -171,7 +196,8 @@ def generate_all():
   nba.get_player_shots(500, 1000)
   nba.get_player_shots(1500, 2000)
   nba.get_player_shots(2000, 2863)
+  nba.get_games()
 
 
 # will take about 2 hours!
-# generate_all()
+generate_all()
