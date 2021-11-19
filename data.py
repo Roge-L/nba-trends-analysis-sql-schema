@@ -2,10 +2,13 @@ import csv
 import os
 import time
 from nba_api.stats.static import players, teams
+from nba_api.stats.endpoints.leaguedashteamstats import LeagueDashTeamStats
 from nba_api.stats.endpoints.leaguedashplayerstats import LeagueDashPlayerStats
 from nba_api.stats.endpoints.shotchartdetail import ShotChartDetail
 from nba_api.stats.endpoints.leaguegamefinder import LeagueGameFinder
-from nba_api.stats.endpoints.boxscorematchups import BoxScoreMatchups
+from nba_api.stats.endpoints.teamdetails import TeamDetails
+
+# 1612709909
 
 # https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/cumestatsplayer.md [PLAYER]
 # https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/cumestatsteam.md [TEAM]
@@ -113,12 +116,19 @@ class NBA:
     export_list(list(self.players), 'player-team.txt')
 
 
-  def get_all_teams(self):
-    t = teams.get_teams()
-    data = []
-    for team in t:
-      data.append(extract_keys(team, ['id', 'full_name'], ['teamID', 'teamName']))
-    export_csv(data, 'Team.csv')
+  def get_teams(self):
+    # t = teams.get_teams()
+    # data = []
+    # for team in t:
+    #   data.append(extract_keys(team, ['id', 'full_name'], ['teamID', 'teamName']))
+    # export_csv(data, 'Team.csv')
+    target_seasons = [
+      "2020-21", "2019-20", "2018-19", "2017-18", "2016-17",
+      "2015-16", "2014-15", "2013-14", "2012-13", "2011-12" 
+    ]
+    t = LeagueDashTeamStats(season=target_seasons[-1])
+    teams = t.get_data_frames()[0]
+    print(teams)
 
 
   def get_player_shots(self, start, stop):
@@ -153,7 +163,7 @@ class NBA:
       "2020-21", "2019-20", "2018-19", "2017-18", "2016-17",
       "2015-16", "2014-15", "2013-14", "2012-13", "2011-12" 
     ]
-    res = LeagueGameFinder(season_nullable=','.join(target_seasons))
+    res = LeagueGameFinder(season_nullable=','.join(target_seasons), league_id_nullable='00')
     games = res.get_data_frames()[0].to_dict(orient='records')
     data = []
 
@@ -192,17 +202,17 @@ def rm(path):
 
 def generate_all():
   # rm('./Player.csv')
-  # rm('./Team.csv')
+  rm('./Team.csv')
   # rm('./Shot(0-500).csv')
   # rm('./Shot(500-1000).csv')
   # rm('./Shot(1000-1500).csv')
   # rm('./Shot(1500-2000).csv')
   # rm('./Shot(2000-2863).csv')
-  rm('./Game.csv')
+  # rm('./Game.csv')
 
   nba = NBA()
   # nba.get_player_stats()
-  # nba.get_all_teams()
+  # nba.get_teams()
   # nba.get_player_shots(0, 500)
   # nba.get_player_shots(500, 1000)
   # nba.get_player_shots(1500, 2000)
@@ -212,3 +222,5 @@ def generate_all():
 
 # will take about 2 hours!
 generate_all()
+# t = TeamDetails(team_id=1612709909)
+# print(t.get_data_frames())
