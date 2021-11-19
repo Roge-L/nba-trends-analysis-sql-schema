@@ -2,8 +2,10 @@ DROP SCHEMA IF EXISTS PhaseTwo CASCADE;
 CREATE SCHEMA PhaseTwo;
 SET search_path TO PhaseTwo;
 
+-- add player name
 CREATE TABLE Player (
-    playerID INT NOT NULL, 
+    playerID INT NOT NULL,
+    playerName TEXT NOT NULL, 
     teamID INT NOT NULL, 
     year INT NOT NULL, 
     GP INT NOT NULL, 
