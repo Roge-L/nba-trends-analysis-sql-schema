@@ -2,7 +2,25 @@ DROP SCHEMA IF EXISTS PhaseTwo CASCADE;
 CREATE SCHEMA PhaseTwo;
 SET search_path TO PhaseTwo;
 
--- add player name
+DROP TABLE IF exists Player CASCADE;
+DROP TABLE IF exists Team CASCADE;
+DROP TABLE IF exists Shot CASCADE;
+DROP TABLE IF exists Game CASCADE;
+
+CREATE TABLE Team (
+    teamID INT NOT NULL PRIMARY KEY, 
+    teamName TEXT NOT NULL
+);
+
+CREATE TABLE Game (
+    gameID INT NOT NULL PRIMARY KEY,
+    teamID INT NOT NULL, 
+    oppTeamID INT NOT NULL, 
+    homeScore INT NOT NULL, 
+    awayScore INT NOT NULL,
+    FOREIGN KEY (teamID) REFERENCES Team(teamID)
+);
+
 CREATE TABLE Player (
     playerID INT NOT NULL,
     playerName TEXT NOT NULL, 
@@ -12,50 +30,32 @@ CREATE TABLE Player (
     PTS FLOAT NOT NULL, 
     FGA INT NOT NULL, 
     FGM INT NOT NULL, 
-    FG% FLOAT NOT NULL, 
-    eFG% FLOAT NOT NULL, 
-    3PTA INT NOT NULL, 
-    3PTM INT NOT NULL, 
-    3PT% FLOAT NOT NULL, 
+    FGpercentage FLOAT NOT NULL, 
+    eFGpercentage FLOAT NOT NULL, 
+    ThreePTA INT NOT NULL, 
+    ThreePTM INT NOT NULL, 
+    ThreePTpercentage FLOAT NOT NULL, 
     FTA INT NOT NULL,
     FTM INT NOT NULL, 
-    FT% FLOAT NOT NULL, 
+    FTpercentage FLOAT NOT NULL, 
     AST FLOAT NOT NULL, 
     REB FLOAT NOT NULL, 
     STL FLOAT NOT NULL, 
     BLK FLOAT NOT NULL, 
     TOV FLOAT NOT NULL, 
     PF FLOAT NOT NULL,
-    PRIMARY KEY (playerID, teamID, year),
-    FOREIGN KEY (teamID) REFERENCES Team(teamID)
-);
-
-CREATE TABLE Team (
-    teamID INT NOT NULL, 
-    teamName TEXT NOT NULL,
-    PRIMARY KEY (teamID)
+    PRIMARY KEY (playerID, teamID, year)
+    --FOREIGN KEY (teamID) REFERENCES Team(teamID)
 );
 
 CREATE TABLE Shot (
-    shotID INT NOT NULL, 
+    shotID BIGINT NOT NULL, 
     playerID INT NOT NULL,
     shotDistance INT NOT NULL,
     gameID INT NOT NULL, 
     clutchTime BOOLEAN NOT NULL,
     shotResult BOOLEAN NOT NULL,
-    PRIMARY KEY (shotID),
-    FOREIGN KEY (playerID) REFERENCES Player(playerID),
-    FOREIGN KEY (gameID) REFERENCES Game(gameID)
+    PRIMARY KEY (shotID)
+    --FOREIGN KEY (playerID) REFERENCES Player(playerID)
+    --FOREIGN KEY (gameID) REFERENCES Game(gameID)
 );
-
--- READ TA COMMENTS ON POTENTIAL IMPROVEMENTS FOR
--- KEYS FOR THIS RELATION
-CREATE TABLE Game (
-    gameID INT NOT NULL,
-    teamID INT NOT NULL, 
-    oppTeamID INT NOT NULL, 
-    homeScore INT NOT NULL, 
-    awayScore INT NOT NULL,
-    PRIMARY KEY (gameID),
-    FOREIGN KEY (teamID, oppTeamID) REFERENCES Team(teamID)
-)
