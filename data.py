@@ -155,17 +155,28 @@ class NBA:
     ]
     res = LeagueGameFinder(season_nullable=','.join(target_seasons))
     games = res.get_data_frames()[0].to_dict(orient='records')
-    print(len(games))
     data = []
-    for i in range(int(len(games) / 2)):
-      home = games[i * 2]
-      away = games[i * 2 + 1]
+
+    home_games = {}
+    away_games = {}
+
+    for game in games:
+      isAway = '@' in game['MATCHUP']
+      id = game['GAME_ID']
+      if not isAway:
+        home_games[id] = game
+      else:
+        away_games[id] = game
+
+    for key in list(home_games.keys()):
+      home = home_games[key]
+      away = away_games[key]
       dct = {
         'gameID': home['GAME_ID'],
         'teamID': home['TEAM_ID'],
         'oppTeamID': away['TEAM_ID'],
         'homeScore': home['PTS'],
-        'awaySdore': away['PTS']
+        'awayScore': away['PTS']
       }
       data.append(dct)
     export_csv(data, 'Game.csv')
@@ -187,15 +198,15 @@ def generate_all():
   # rm('./Shot(1000-1500).csv')
   # rm('./Shot(1500-2000).csv')
   # rm('./Shot(2000-2863).csv')
-  # rm('./Game.csv)
+  rm('./Game.csv')
 
   nba = NBA()
-  nba.get_player_stats()
-  nba.get_all_teams()
-  nba.get_player_shots(0, 500)
-  nba.get_player_shots(500, 1000)
-  nba.get_player_shots(1500, 2000)
-  nba.get_player_shots(2000, 2863)
+  # nba.get_player_stats()
+  # nba.get_all_teams()
+  # nba.get_player_shots(0, 500)
+  # nba.get_player_shots(500, 1000)
+  # nba.get_player_shots(1500, 2000)
+  # nba.get_player_shots(2000, 2863)
   nba.get_games()
 
 
