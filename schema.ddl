@@ -44,8 +44,9 @@ CREATE TABLE Player (
     BLK FLOAT NOT NULL, 
     TOV FLOAT NOT NULL, 
     PF FLOAT NOT NULL,
-    PRIMARY KEY (playerID, teamID, year)
-    --FOREIGN KEY (teamID) REFERENCES Team(teamID)
+    PRIMARY KEY (playerID, teamID, year),
+    FOREIGN KEY (teamID) REFERENCES Team(teamID),
+    UNIQUE(playerID, teamID, year)
 );
 
 CREATE TABLE Shot (
@@ -55,7 +56,6 @@ CREATE TABLE Shot (
     gameID INT NOT NULL, 
     clutchTime BOOLEAN NOT NULL,
     shotResult BOOLEAN NOT NULL,
-    PRIMARY KEY (shotID)
-    --FOREIGN KEY (playerID) REFERENCES Player(playerID)
-    --FOREIGN KEY (gameID) REFERENCES Game(gameID)
+    PRIMARY KEY (shotID),
+    FOREIGN KEY (gameID) REFERENCES Game(gameID)
 );
