@@ -112,3 +112,34 @@
 --  2018-19 | 51377
 --  2019-20 | 43986
 --  2020-21 | 41661
+
+-- top 5 scorers per season, ppg, 3pt%
+-- SELECT playerName, year, PTS, ThreePTA, FGA, ROUND(percent_threes::numeric, 3)
+-- FROM (
+--   SELECT 
+--     playerName, 
+--     year, 
+--     PTS, 
+--     ThreePTA,
+--     FGA,
+--     CASE
+--       WHEN FGA = 0 THEN 0
+--       ELSE CAST(ThreePTA AS FLOAT) / CAST(FGA AS FLOAT)
+--     END as percent_threes,
+--   ROW_NUMBER() OVER (PARTITION BY year ORDER BY PTS DESC)
+--   AS rn
+--   FROM Player
+-- ) tmp 
+-- WHERE rn <= 3
+-- ORDER BY year, PTS DESC;
+
+-- get freq of shots by range, 2020-2021 season
+-- SELECT 2 * s.d AS distance_ft, count(t.shotDistance)
+-- FROM 
+--   generate_series(0, 20) s(d) LEFT OUTER JOIN (
+--     SELECT * FROM 
+--     (SELECT playerID, year FROM Player) p NATURAL JOIN Shot
+--     WHERE year="2020-21"
+--   ) t ON s.d = floor(t.shotDistance / 2)
+-- GROUP BY s.d
+-- ORDER BY s.d;
