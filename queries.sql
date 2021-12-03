@@ -185,4 +185,17 @@
 --   FROM Shot NATURAL JOIN Game
 --   GROUP BY year) sq2;
 
--- winning and losing teams 3pt%
+-- winning and losing teams 3pt% (regular season and playoff)
+SELECT year, teamName, home_wins + away_wins AS wins FROM
+  (SELECT year, teamName, count(*) AS home_wins
+  FROM Game NATURAL JOIN Team
+  WHERE homeScore > awayScore
+  GROUP BY year, teamName) sq1
+
+  NATURAL JOIN
+
+  (SELECT year, teamName, count(*) AS away_wins
+  FROM Game JOIN Team ON oppTeamID = Team.teamID
+  WHERE awayScore > homeScore
+  GROUP BY year, teamName) sq2
+ORDER BY year, wins DESC;
