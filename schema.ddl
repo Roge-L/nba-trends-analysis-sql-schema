@@ -17,6 +17,7 @@ CREATE TABLE Game (
     teamID INT NOT NULL, 
     oppTeamID INT NOT NULL, 
     homeScore INT NOT NULL, 
+    date INT NOT NULL,
     awayScore INT NOT NULL,
     FOREIGN KEY (teamID) REFERENCES Team(teamID)
 );

@@ -6,7 +6,7 @@ from nba_api.stats.endpoints.leaguedashteamstats import LeagueDashTeamStats
 from nba_api.stats.endpoints.leaguedashplayerstats import LeagueDashPlayerStats
 from nba_api.stats.endpoints.shotchartdetail import ShotChartDetail
 from nba_api.stats.endpoints.leaguegamefinder import LeagueGameFinder
-from nba_api.stats.endpoints.teamdetails import TeamDetails
+from nba_api.stats.endpoints.playerprofilev2 import PlayerProfileV2
 
 # 1612709909
 
@@ -62,6 +62,12 @@ def export_list(lst, filename):
       f.write("\n".join(["%s %s" % (a, b)]) + "\n")
 
 
+def export_game_ids(lst, filename):
+  with open(filename, 'w') as f:
+    for a in lst:
+      f.write("\n".join(["%s" % (a)]) + "\n")
+
+
 def import_list(filename):
   # import an a-b tuple list from file
   lst = []
@@ -69,6 +75,14 @@ def import_list(filename):
     for line in f:
       lst.append(tuple(line.split()))
   return lst
+
+
+def import_game_ids(filename):
+  lst = []
+  with open(filename, 'r') as f:
+    for line in f:
+      lst.append(line.strip())
+    return lst
 
 
 class NBA:
@@ -90,7 +104,7 @@ class NBA:
     hh = False
     for season in target_seasons:
       results = []
-      res = LeagueDashPlayerStats(season=season).league_dash_player_stats.get_dict()
+      res = LeagueDashPlayerStats(season=season, league_id_nullable='00').league_dash_player_stats.get_dict()
       headers = res['headers']
       players = res['data']
       for player in players:
@@ -110,7 +124,7 @@ class NBA:
         self.players.add((dct['PLAYER_ID'], dct['TEAM_ID']))
       export_csv(results, 'Player.csv', mode='a', hasHeader=hh)
       hh = True
-      time.sleep(0.5)
+      time.sleep(0.25)
 
     
     export_list(list(self.players), 'player-team.txt')
@@ -133,16 +147,20 @@ class NBA:
 
   def get_player_shots(self, start, stop):
     player_teams = import_list('player-team.txt')
+    game_ids = set(import_game_ids('game-ids.txt'))
     hh = False
 
     progress = start
     for pt in player_teams[start:stop]:
       player = pt[0]
       team = pt[1]
+
       s = ShotChartDetail(team_id=team, player_id=player, context_measure_simple='FGA', timeout=30)
       shots = s.get_data_frames()[0].to_dict(orient='records')
       res = []
       for shot in shots:
+        if shot['GAME_ID'] not in game_ids:
+          continue
         res.append(extract_keys(shot, 
           [None, 'PLAYER_ID', 'SHOT_DISTANCE', 'GAME_ID', None, 'SHOT_MADE_FLAG'], 
           ['shotID', 'playerID', 'shotDistance', 'gameID', 'clutchTime', 'shotResult'],
@@ -203,6 +221,8 @@ class NBA:
     home_games = {}
     away_games = {}
 
+    game_ids = []
+
     for game in games:
       isAway = '@' in game['MATCHUP']
       id = game['GAME_ID']
@@ -224,10 +244,13 @@ class NBA:
         'teamID': home['TEAM_ID'],
         'oppTeamID': away['TEAM_ID'],
         'homeScore': home['PTS'],
-        'awayScore': away['PTS']
+        'awayScore': away['PTS'],
+        'date': home['GAME_DATE']
       }
       data.append(dct)
+      game_ids.append(home['GAME_ID'])
     export_csv(data, 'Game.csv')
+    export_game_ids(game_ids, 'game-ids.txt')
       
 
 def rm(path):
@@ -240,7 +263,7 @@ def rm(path):
 
 def generate_all():
   # rm('./Player.csv')
-  rm('./Team.csv')
+  # rm('./Team.csv')
   # rm('./Shot(0-500).csv')
   # rm('./Shot(500-1000).csv')
   # rm('./Shot(1000-1500).csv')
@@ -253,12 +276,15 @@ def generate_all():
   # nba.get_teams()
   # nba.get_player_shots(0, 500)
   # nba.get_player_shots(500, 1000)
+  # nba.get_player_shots(1000, 1500)
   # nba.get_player_shots(1500, 2000)
-  # nba.get_player_shots(2000, 2863)
-  nba.get_games()
+  nba.get_player_shots(2000, 2863)
+  # nba.get_games()
 
 
 # will take about 2 hours!
 generate_all()
-# t = TeamDetails(team_id=1610616833)
-# print(t.get_dict())
+# t = TeamDetails(team_id=1610612743)
+# t = LeagueGameFinder(game_id_nullable='0022100003', league_id_nullable='00')
+# t = PlayerProfileV2(player_id='204456')
+# print(t.get_data_frames())
