@@ -1,6 +1,7 @@
 import csv
 import os
 import time
+import datetime
 from nba_api.stats.static import players, teams
 from nba_api.stats.endpoints.leaguedashteamstats import LeagueDashTeamStats
 from nba_api.stats.endpoints.leaguedashplayerstats import LeagueDashPlayerStats
@@ -83,6 +84,31 @@ def import_game_ids(filename):
     for line in f:
       lst.append(line.strip())
     return lst
+
+
+def get_nba_season(datestr):
+  def t(_str):
+    return datetime.datetime.strptime(_str, "%Y-%m-%d").date()
+
+  date = t(datestr)
+  seasons = [
+    (t("2011-12-01"), t("2012-06-30"), "2011-12"),
+    (t("2012-10-01"), t("2013-06-30"), "2012-13"),
+    (t("2013-10-01"), t("2014-06-30"), "2013-14"),
+    (t("2014-10-01"), t("2015-06-30"), "2014-15"),
+    (t("2015-10-01"), t("2016-06-30"), "2015-16"),
+    (t("2016-10-01"), t("2017-06-30"), "2016-17"),
+    (t("2017-9-01"), t("2018-06-30"), "2017-18"),
+    (t("2018-9-01"), t("2019-06-30"), "2018-19"),
+    (t("2019-10-01"), t("2020-10-30"), "2019-20"),
+    (t("2020-12-01"), t("2021-07-30"), "2020-21"),  
+  ]
+
+  for s in seasons:
+    if s[0] <= date <=s[1]:
+      return s[2]
+
+  print(datestr)
 
 
 class NBA:
@@ -245,7 +271,7 @@ class NBA:
         'oppTeamID': away['TEAM_ID'],
         'homeScore': home['PTS'],
         'awayScore': away['PTS'],
-        'date': home['GAME_DATE']
+        'year': get_nba_season(home['GAME_DATE'])
       }
       data.append(dct)
       game_ids.append(home['GAME_ID'])
