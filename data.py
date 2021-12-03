@@ -278,8 +278,8 @@ def generate_all():
   # nba.get_player_shots(500, 1000)
   # nba.get_player_shots(1000, 1500)
   # nba.get_player_shots(1500, 2000)
-  nba.get_player_shots(2000, 2863)
-  # nba.get_games()
+  # nba.get_player_shots(2000, 2863)
+  nba.get_games()
 
 
 # will take about 2 hours!
