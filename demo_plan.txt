@@ -2,7 +2,7 @@ Example Interaction with the postgreSQL shell:
 
 \i schema.ddl
 
-\i ../full-data.sql
+\i data/full-data.sql
 
 \d Player
 \d Team
