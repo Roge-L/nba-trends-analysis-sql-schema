@@ -1,14 +1,17 @@
-DROP VIEW FG_Threes CASCADE IF EXISTS;
-DROP VIEW FG_Twos CASCADE IF EXISTS;
-DROP VIEW FG_Proportions CASCADE IF EXISTS;
+DROP VIEW IF EXISTS FG_Threes CASCADE;
+DROP VIEW IF EXISTS FG_Twos CASCADE;
+DROP VIEW IF EXISTS FG_Proportions CASCADE;
+DROP VIEW IF EXISTS Shot_Freq_Latest CASCADE;
+DROP VIEW IF EXISTS Shot_Freq_Earliest CASCADE;
 
-DROP VIEW Top_5_Scorers CASCADE IF EXISTS;
-DROP VIEW Game_Scores CASCADE IF EXISTS;
-DROP VIEW Average_Player_Stats CASCADE IF EXISTS;
+DROP VIEW IF EXISTS Top_5_Scorers CASCADE;
+DROP VIEW IF EXISTSGame_Scores CASCADE;
+DROP VIEW IF EXISTS Average_Player_Stats CASCADE;
+DROP VIEW IF EXISTS Winning_Losing_FG CASCADE;
 
-DROP VIEW PF_Stats CASCADE IF EXISTS;
-DROP VIEW FT_Stats CASCADE IF EXISTS;
-DROP VIEW Clutch_FG CASCADE IF EXISTS;
+DROP VIEW IF EXISTS PF_Stats CASCADE;
+DROP VIEW IF EXISTS FTA CASCADE;
+DROP VIEW IF EXISTS Clutch_FG CASCADE;
 
 
 -- get 3pts attempted, made, pct by season
@@ -63,26 +66,28 @@ CREATE VIEW FG_Proportions
   ORDER BY year DESC;
 
 -- get freq of shots by range, 2020-2021 season
-SELECT 2 * s.d AS distance_ft, count(t.shotDistance)
-FROM 
-  generate_series(0, 20) s(d) LEFT OUTER JOIN (
-    SELECT * FROM 
-    (SELECT playerID, year FROM Player) p NATURAL JOIN Shot
-    WHERE year='2020-21'
-  ) t ON s.d = floor(t.shotDistance / 2)
-GROUP BY s.d
-ORDER BY s.d;
+CREATE VIEW Shot_Freq_Latest AS
+  SELECT 2 * s.d AS distance_ft, count(t.shotDistance)
+  FROM 
+    generate_series(0, 20) s(d) LEFT OUTER JOIN (
+      SELECT * FROM 
+      (SELECT playerID, year FROM Player) p NATURAL JOIN Shot
+      WHERE year='2020-21'
+    ) t ON s.d = floor(t.shotDistance / 2)
+  GROUP BY s.d
+  ORDER BY s.d;
 
 -- get freq of shots by range, 2011-2012 season
-SELECT 2 * s.d AS distance_ft, count(t.shotDistance)
-FROM 
-  generate_series(0, 20) s(d) LEFT OUTER JOIN (
-    SELECT * FROM 
-    (SELECT playerID, year FROM Player) p NATURAL JOIN Shot
-    WHERE year='2011-12'
-  ) t ON s.d = floor(t.shotDistance / 2)
-GROUP BY s.d
-ORDER BY s.d;
+CREATE VIEW Shot_Freq_Earliest AS
+  SELECT 2 * s.d AS distance_ft, count(t.shotDistance)
+  FROM 
+    generate_series(0, 20) s(d) LEFT OUTER JOIN (
+      SELECT * FROM 
+      (SELECT playerID, year FROM Player) p NATURAL JOIN Shot
+      WHERE year='2011-12'
+    ) t ON s.d = floor(t.shotDistance / 2)
+  GROUP BY s.d
+  ORDER BY s.d;
 
 -- correlation betweens games won and 3 point frequency
 
@@ -133,19 +138,20 @@ CREATE VIEW Average_Player_Stats AS
   ORDER BY year DESC;
 
 -- winning and losing teams fg%, 3pt% (regular season and playoff)
-SELECT year, teamName, home_wins + away_wins AS wins FROM
-  (SELECT year, teamName, count(*) AS home_wins
-  FROM Game NATURAL JOIN Team
-  WHERE homeScore > awayScore
-  GROUP BY year, teamName) sq1
+CREATE VIEW Winning_Losing_FG AS
+  SELECT year, teamName, home_wins + away_wins AS wins FROM
+    (SELECT year, teamName, count(*) AS home_wins
+    FROM Game NATURAL JOIN Team
+    WHERE homeScore > awayScore
+    GROUP BY year, teamName) sq1
 
-  NATURAL JOIN
+    NATURAL JOIN
 
-  (SELECT year, teamName, count(*) AS away_wins
-  FROM Game JOIN Team ON oppTeamID = Team.teamID
-  WHERE awayScore > homeScore
-  GROUP BY year, teamName) sq2
-ORDER BY year, wins DESC;
+    (SELECT year, teamName, count(*) AS away_wins
+    FROM Game JOIN Team ON oppTeamID = Team.teamID
+    WHERE awayScore > homeScore
+    GROUP BY year, teamName) sq2
+  ORDER BY year, wins DESC;
 
 -- offensive, defensive rating by year
 
