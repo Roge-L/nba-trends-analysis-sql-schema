@@ -1,11 +1,11 @@
 --- (a) Load schema and data ---------------------------------------------
 -----
-csc343h-lamroger=> \i schema.ddl 
+csc343h-lamroger=> \i schema.ddl
 psql:schema.ddl:1: NOTICE:  drop cascades to 4 other objects
-DETAIL:  drop cascades to table team
-drop cascades to table game
-drop cascades to table player
-drop cascades to table shot
+DETAIL:  drop cascades to table phasetwo.team
+drop cascades to table phasetwo.game
+drop cascades to table phasetwo.player
+drop cascades to table phasetwo.shot
 DROP SCHEMA
 CREATE SCHEMA
 SET
@@ -21,17 +21,50 @@ CREATE TABLE
 CREATE TABLE
 CREATE TABLE
 CREATE TABLE
-csc343h-lamroger=> \i sample-data.sql 
+csc343h-lamroger=> 
+csc343h-lamroger=> \i data/full-data.sql
 COPY 30
 COPY 13412
 COPY 5022
-COPY 100
+COPY 383691
+COPY 364790
+COPY 297530
+COPY 335304
+COPY 576547
 
 
 
 --- (b) Run \d on each table ---------------------------------------------
 -----
 csc343h-lamroger=> \d Player
+      Column       |       Type       | Collation | Nullable | Default 
+-------------------+------------------+-----------+----------+---------
+ playerid          | integer          |           | not null | 
+ playername        | text             |           | not null | 
+ teamid            | integer          |           | not null | 
+ year              | text             |           | not null | 
+ gp                | integer          |           | not null | 
+ pts               | double precision |           | not null | 
+ fga               | integer          |           | not null | 
+ fgm               | integer          |           | not null | 
+ fgpercentage      | double precision |           | not null | 
+ efgpercentage     | double precision |           | not null | 
+ threepta          | integer          |           | not null | 
+ threeptm          | integer          |           | not null | 
+ threeptpercentage | double precision |           | not null | 
+ fta               | integer          |           | not null | 
+ ftm               | integer          |           | not null | 
+ ftpercentage      | double precision |           | not null | 
+ ast               | double precision |           | not null | 
+ reb               | double precision |           | not null | 
+ stl               | double precision |           | not null | 
+ blk               | double precision |           | not null | 
+ tov               | double precision |           | not null | 
+ pf                | double precision |           | not null | 
+Indexes:
+    "player_pkey" PRIMARY KEY, btree (playerid, teamid, year)
+Foreign-key constraints:
+    "player_teamid_fkey" FOREIGN KEY (teamid) REFERENCES team(teamid)
 csc343h-lamroger=> \d Team
                 Table "phasetwo.team"
   Column  |  Type   | Collation | Nullable | Default 
@@ -43,7 +76,6 @@ Indexes:
 Referenced by:
     TABLE "game" CONSTRAINT "game_teamid_fkey" FOREIGN KEY (teamid) REFERENCES team(teamid)
     TABLE "player" CONSTRAINT "player_teamid_fkey" FOREIGN KEY (teamid) REFERENCES team(teamid)
-
 csc343h-lamroger=> \d Shot
                   Table "phasetwo.shot"
     Column    |  Type   | Collation | Nullable | Default 
@@ -58,9 +90,7 @@ Indexes:
     "shot_pkey" PRIMARY KEY, btree (shotid)
 Foreign-key constraints:
     "shot_gameid_fkey" FOREIGN KEY (gameid) REFERENCES game(gameid)
-
-csc343h-lamroger=> \d Game
-                Table "phasetwo.game"
+csc343h-lamroger=> \d Game                Table "phasetwo.game"
   Column   |  Type   | Collation | Nullable | Default 
 -----------+---------+-----------+----------+---------
  gameid    | integer |           | not null | 
@@ -68,6 +98,7 @@ csc343h-lamroger=> \d Game
  oppteamid | integer |           | not null | 
  homescore | integer |           | not null | 
  awayscore | integer |           | not null | 
+ year      | text    |           | not null | 
 Indexes:
     "game_pkey" PRIMARY KEY, btree (gameid)
 Foreign-key constraints:
@@ -77,9 +108,8 @@ Referenced by:
 
 
 
---- (c) Run SELECT coung(*) on each table --------------------------------
------
-csc343h-lamroger=> SELECT count(*) FROM Player;
+--- (c) Run SELECT count(*) on each table --------------------------------
+-----csc343h-lamroger=> SELECT count(*) FROM Player;
  count 
 -------
   5022
@@ -92,9 +122,9 @@ csc343h-lamroger=> SELECT count(*) FROM Team;
 (1 row)
 
 csc343h-lamroger=> SELECT count(*) FROM Shot;
- count 
--------
-   100
+ROM Game;  count  
+---------
+ 1957862
 (1 row)
 
 csc343h-lamroger=> SELECT count(*) FROM Game;
@@ -107,7 +137,6 @@ csc343h-lamroger=> SELECT count(*) FROM Game;
 
 --- (d) Show some rows from each table -----------------------------------
 -----
-csc343h-lamroger=> -- Some attributes excluded so that rows show up on main terminal
 csc343h-lamroger=> SELECT playerID,playerName,teamID,year,GP,PTS,FGA,FGM,FGpercentage,eFGpercentage,3PTA,3PTM,3PTpercentage
 csc343h-lamroger-> FROM Player
 csc343h-lamroger-> WHERE FGpercentage > 0.7 AND GP > 50;
@@ -135,22 +164,19 @@ csc343h-lamroger-> WHERE teamID = 1610612747 OR teamID = 1610612761;
 
 csc343h-lamroger=> SELECT *
 csc343h-lamroger-> FROM Shot
-csc343h-lamroger-> WHERE gameID = 0021900004;
+csc343h-lamroger-> WHERE gameID = 0021900004 AND shotdistance = 1 AND clutchtime = TRUE;
    shotid    | playerid | shotdistance |  gameid  | clutchtime | shotresult 
 -------------+----------+--------------+----------+------------+------------
- 21900004279 |   204456 |            1 | 21900004 | f          | t
- 21900004311 |   204456 |            1 | 21900004 | f          | f
- 21900004532 |   204456 |            1 | 21900004 | f          | t
- 21900004564 |   204456 |           13 | 21900004 | f          | f
-(4 rows)
+ 21900004700 |  1627734 |            1 | 21900004 | t          | t
+ 21900004676 |   201565 |            1 | 21900004 | t          | f
+(2 rows)
 
 csc343h-lamroger=> SELECT *
 csc343h-lamroger-> FROM Game
 csc343h-lamroger-> WHERE (homeScore - awayScore) > 50;
-  gameid  |   teamid   | oppteamid  | homescore | awayscore 
-----------+------------+------------+-----------+-----------
- 22000737 | 1610612761 | 1610612744 |       130 |        77
- 21701072 | 1610612766 | 1610612763 |       140 |        79
- 11700012 | 1610612740 | 1610612741 |       109 |         0
- 21400120 | 1610612742 | 1610612755 |       123 |        70
-(4 rows)
+  gameid  |   teamid   | oppteamid  | homescore | awayscore |  year   
+----------+------------+------------+-----------+-----------+---------
+ 22000737 | 1610612761 | 1610612744 |       130 |        77 | 2020-21
+ 21701072 | 1610612766 | 1610612763 |       140 |        79 | 2017-18
+ 21400120 | 1610612742 | 1610612755 |       123 |        70 | 2014-15
+(3 rows)
