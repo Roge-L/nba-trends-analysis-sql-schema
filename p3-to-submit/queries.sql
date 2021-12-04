@@ -94,7 +94,14 @@ CREATE VIEW Shot_Freq_Earliest AS
 
 -- top 5 scorers per season, ppg, 3pt%
 CREATE VIEW Top_5_Scorers AS
-  SELECT playerName, year, PTS, ThreePTA, FGA, ROUND(percent_threes::numeric, 3)
+  SELECT 
+    playerName, 
+    year, 
+    PTS, 
+    ThreePTA, 
+    FGA, 
+    ROUND(percent_threes::numeric, 3) as proportion_threes,
+    eFGpercentage
   FROM (
     SELECT 
       playerName, 
@@ -102,6 +109,7 @@ CREATE VIEW Top_5_Scorers AS
       PTS, 
       ThreePTA,
       FGA,
+      eFGpercentage,
       CASE
         WHEN FGA = 0 THEN 0
         ELSE CAST(ThreePTA AS FLOAT) / CAST(FGA AS FLOAT)
@@ -181,14 +189,14 @@ CREATE VIEW PF_Stats AS
   SELECT year, ROUND(sum(PF * GP)::numeric, 0), ROUND(avg(PF)::numeric, 2) as avg_pf
   FROM Player 
   GROUP BY year 
-  ORDER BY year ASC;
+  ORDER BY year DESC;
 
 -- fta per game, per player per game
 CREATE VIEW FT_Stats AS
   SELECT year, sum(FTA), ROUND(avg(CAST(FTA AS FLOAT) / CAST(GP AS FLOAT))::numeric, 2) as avg_fta
   FROM Player
   GROUP BY year
-  ORDER BY year ASC;
+  ORDER BY year DESC;
 
 -- percentages of clutch shots in tight games compared to average
 CREATE VIEW Clutch_FG AS
