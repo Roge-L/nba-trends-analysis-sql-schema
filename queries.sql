@@ -1,38 +1,44 @@
--- get number of 3s attempted per season
--- SELECT count(*) 
--- FROM Shot NATURAL JOIN (SELECT playerID, year FROM Player)
--- WHERE shotDistance >= 24
--- GROUP BY year;
---   year   | count
--- ---------+--------
---  2011-12 | 243970
---  2012-13 | 285057
---  2013-14 | 314183
---  2014-15 | 343314
---  2015-16 | 358630
---  2016-17 | 372894
---  2017-18 | 374841
---  2018-19 | 373824
---  2019-20 | 347252
---  2020-21 | 322142
+-- get 3pts attempted, made, pct by season
+CREATE VIEW FG_Threes
+  SELECT 
+    year, 
+    threes_attempted, 
+    threes_made, 
+    ROUND((CAST(threes_made AS FLOAT) / CAST (threes_attempted AS FLOAT))::numeric, 3) AS threes_fg_pct 
+  FROM
+    (SELECT year, count(*) AS threes_attempted
+    FROM Shot NATURAL JOIN (SELECT playerID, year FROM Player) sq11
+    WHERE shotDistance >= 24
+    GROUP BY year) sq1
+    
+    NATURAL JOIN
 
--- 3pts made by season
--- SELECT count(*) 
--- FROM Shot NATURAL JOIN (SELECT playerID, year FROM Player)
--- WHERE shotDistance >= 24 AND shotResult=TRUE
--- GROUP BY year;
---   year   | count
--- ---------+--------
---  2011-12 |  86296
---  2012-13 | 100702
---  2013-14 | 110944
---  2014-15 | 121191
---  2015-16 | 126558
---  2016-17 | 131819
---  2017-18 | 132243
---  2018-19 | 132268
---  2019-20 | 122745
---  2020-21 | 113895
+    (SELECT year, count(*) AS threes_made
+    FROM Shot NATURAL JOIN (SELECT playerID, year FROM Player) sq21
+    WHERE shotDistance >= 24 AND shotResult=TRUE
+    GROUP BY year) sq2
+  ORDER BY year DESC;
+
+-- get 2s attempted, made, pct by season
+CREATE VIEW FG_Twos
+  SELECT 
+    year, 
+    twos_attempted, 
+    twos_made, 
+    ROUND((CAST(twos_made AS FLOAT) / CAST (twos_attempted AS FLOAT))::numeric, 3) AS twos_fg_pct 
+  FROM
+    (SELECT year, count(*) AS twos_attempted
+    FROM Shot NATURAL JOIN (SELECT playerID, year FROM Player) sq11
+    WHERE shotDistance < 24
+    GROUP BY year) sq1
+    
+    NATURAL JOIN
+
+    (SELECT year, count(*) AS twos_made
+    FROM Shot NATURAL JOIN (SELECT playerID, year FROM Player) sq21
+    WHERE shotDistance < 24 AND shotResult=TRUE
+    GROUP BY year) sq2
+  ORDER BY year DESC;
 
 -- 2pts attempted by season
 -- SELECT count(*) 
@@ -70,63 +76,6 @@
 --  2019-20 | 494492
 --  2020-21 | 467405
 
--- fouls per Game
--- SELECT year, ROUND(avg(PF)::numeric, 1) as avg_pf
--- FROM Player
--- GROUP BY year
--- ORDER BY year DESC;
-
--- fta per game
--- SELECT year, sum(FTA) FROM Player
--- GROUP BY year
--- ORDER BY year ASC;
---   year   |  sum
--- ---------+-------
---  2011-12 | 44472
---  2012-13 | 54533
---  2013-14 | 58029
---  2014-15 | 56198
---  2015-16 | 57469
---  2016-17 | 56855
---  2017-18 | 53325
---  2018-19 | 56758
---  2019-20 | 48943
---  2020-21 | 47135
-
--- SELECT year, sum(PF * GP) FROM Player GROUP BY year ORDER BY year ASC;
---   year   |  sum
--- ---------+-------
---  2011-12 | 38742
---  2012-13 | 48686
---  2013-14 | 50892
---  2014-15 | 49791
---  2015-16 | 49785
---  2016-17 | 48979
---  2017-18 | 48804
---  2018-19 | 51377
---  2019-20 | 43986
---  2020-21 | 41661
-
--- top 5 scorers per season, ppg, 3pt%
--- SELECT playerName, year, PTS, ThreePTA, FGA, ROUND(percent_threes::numeric, 3)
--- FROM (
---   SELECT 
---     playerName, 
---     year, 
---     PTS, 
---     ThreePTA,
---     FGA,
---     CASE
---       WHEN FGA = 0 THEN 0
---       ELSE CAST(ThreePTA AS FLOAT) / CAST(FGA AS FLOAT)
---     END as percent_threes,
---   ROW_NUMBER() OVER (PARTITION BY year ORDER BY PTS DESC)
---   AS rn
---   FROM Player
--- ) tmp 
--- WHERE rn <= 3
--- ORDER BY year, PTS DESC;
-
 -- get freq of shots by range, 2020-2021 season
 -- SELECT 2 * s.d AS distance_ft, count(t.shotDistance)
 -- FROM 
@@ -149,6 +98,30 @@
 -- GROUP BY s.d
 -- ORDER BY s.d;
 
+-- correlation betweens games won and 3 point frequency
+
+-----------------------------------------------------------------------------------------------------
+
+-- top 5 scorers per season, ppg, 3pt%
+-- SELECT playerName, year, PTS, ThreePTA, FGA, ROUND(percent_threes::numeric, 3)
+-- FROM (
+--   SELECT 
+--     playerName, 
+--     year, 
+--     PTS, 
+--     ThreePTA,
+--     FGA,
+--     CASE
+--       WHEN FGA = 0 THEN 0
+--       ELSE CAST(ThreePTA AS FLOAT) / CAST(FGA AS FLOAT)
+--     END as percent_threes,
+--   ROW_NUMBER() OVER (PARTITION BY year ORDER BY PTS DESC)
+--   AS rn
+--   FROM Player
+-- ) tmp 
+-- WHERE rn <= 3
+-- ORDER BY year, PTS DESC;
+
 -- get min, avg, max scores for games in each season
 -- SELECT year, min(homeScore), ROUND(avg(homeScore)::numeric, 1), max(homeScore)
 -- FROM Game
@@ -170,6 +143,63 @@
 -- GROUP BY year
 -- ORDER BY year DESC;
 
+-- winning and losing teams fg%, 3pt% (regular season and playoff)
+SELECT year, teamName, home_wins + away_wins AS wins FROM
+  (SELECT year, teamName, count(*) AS home_wins
+  FROM Game NATURAL JOIN Team
+  WHERE homeScore > awayScore
+  GROUP BY year, teamName) sq1
+
+  NATURAL JOIN
+
+  (SELECT year, teamName, count(*) AS away_wins
+  FROM Game JOIN Team ON oppTeamID = Team.teamID
+  WHERE awayScore > homeScore
+  GROUP BY year, teamName) sq2
+ORDER BY year, wins DESC;
+
+-- offensive, defensive rating by year
+
+-----------------------------------------------------------------------------------------------------
+
+-- number of fouls per season
+-- SELECT year, sum(PF * GP) FROM Player GROUP BY year ORDER BY year ASC;
+--   year   |  sum
+-- ---------+-------
+--  2011-12 | 38742
+--  2012-13 | 48686
+--  2013-14 | 50892
+--  2014-15 | 49791
+--  2015-16 | 49785
+--  2016-17 | 48979
+--  2017-18 | 48804
+--  2018-19 | 51377
+--  2019-20 | 43986
+--  2020-21 | 41661
+
+-- fouls per Game for the average player
+-- SELECT year, ROUND(avg(PF)::numeric, 1) as avg_pf
+-- FROM Player
+-- GROUP BY year
+-- ORDER BY year DESC;
+
+-- fta per game
+-- SELECT year, sum(FTA) FROM Player
+-- GROUP BY year
+-- ORDER BY year ASC;
+--   year   |  sum
+-- ---------+-------
+--  2011-12 | 44472
+--  2012-13 | 54533
+--  2013-14 | 58029
+--  2014-15 | 56198
+--  2015-16 | 57469
+--  2016-17 | 56855
+--  2017-18 | 53325
+--  2018-19 | 56758
+--  2019-20 | 48943
+--  2020-21 | 47135
+
 -- percentages of clutch shots in tight games compared to average
 -- SELECT year, fg_pct, clutch_fg_pct FROM
 --   (SELECT year, ROUND((CAST(sum(shotResult::integer) AS FLOAT) / CAST(count(*) AS FLOAT))::numeric, 3) AS clutch_fg_pct
@@ -185,17 +215,4 @@
 --   FROM Shot NATURAL JOIN Game
 --   GROUP BY year) sq2;
 
--- winning and losing teams 3pt% (regular season and playoff)
-SELECT year, teamName, home_wins + away_wins AS wins FROM
-  (SELECT year, teamName, count(*) AS home_wins
-  FROM Game NATURAL JOIN Team
-  WHERE homeScore > awayScore
-  GROUP BY year, teamName) sq1
-
-  NATURAL JOIN
-
-  (SELECT year, teamName, count(*) AS away_wins
-  FROM Game JOIN Team ON oppTeamID = Team.teamID
-  WHERE awayScore > homeScore
-  GROUP BY year, teamName) sq2
-ORDER BY year, wins DESC;
+-----------------------------------------------------------------------------------------------------
