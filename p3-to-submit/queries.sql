@@ -1,6 +1,15 @@
-DROP VIEW FG_Threes CASCADE;
-DROP VIEW FG_Twos CASCADE;
-DROP VIEW FG_Proportions CASCADE;
+DROP VIEW FG_Threes CASCADE IF EXISTS;
+DROP VIEW FG_Twos CASCADE IF EXISTS;
+DROP VIEW FG_Proportions CASCADE IF EXISTS;
+
+DROP VIEW Top_5_Scorers CASCADE IF EXISTS;
+DROP VIEW Game_Scores CASCADE IF EXISTS;
+DROP VIEW Average_Player_Stats CASCADE IF EXISTS;
+
+DROP VIEW PF_Stats CASCADE IF EXISTS;
+DROP VIEW FT_Stats CASCADE IF EXISTS;
+DROP VIEW Clutch_FG CASCADE IF EXISTS;
+
 
 -- get 3pts attempted, made, pct by season
 CREATE VIEW FG_Threes AS
@@ -80,45 +89,48 @@ ORDER BY s.d;
 -----------------------------------------------------------------------------------------------------
 
 -- top 5 scorers per season, ppg, 3pt%
-SELECT playerName, year, PTS, ThreePTA, FGA, ROUND(percent_threes::numeric, 3)
-FROM (
-  SELECT 
-    playerName, 
-    year, 
-    PTS, 
-    ThreePTA,
-    FGA,
-    CASE
-      WHEN FGA = 0 THEN 0
-      ELSE CAST(ThreePTA AS FLOAT) / CAST(FGA AS FLOAT)
-    END as percent_threes,
-  ROW_NUMBER() OVER (PARTITION BY year ORDER BY PTS DESC)
-  AS rn
-  FROM Player
-) tmp 
-WHERE rn <= 3
-ORDER BY year, PTS DESC;
+CREATE VIEW Top_5_Scorers AS
+  SELECT playerName, year, PTS, ThreePTA, FGA, ROUND(percent_threes::numeric, 3)
+  FROM (
+    SELECT 
+      playerName, 
+      year, 
+      PTS, 
+      ThreePTA,
+      FGA,
+      CASE
+        WHEN FGA = 0 THEN 0
+        ELSE CAST(ThreePTA AS FLOAT) / CAST(FGA AS FLOAT)
+      END as percent_threes,
+    ROW_NUMBER() OVER (PARTITION BY year ORDER BY PTS DESC)
+    AS rn
+    FROM Player
+  ) tmp 
+  WHERE rn <= 3
+  ORDER BY year, PTS DESC;
 
 -- get min, avg, max scores for games in each season
-SELECT year, min(homeScore), ROUND(avg(homeScore)::numeric, 1), max(homeScore)
-FROM Game
-GROUP BY year
-ORDER BY year DESC;
+CREATE VIEW Game_Scores AS
+  SELECT year, min(homeScore), ROUND(avg(homeScore)::numeric, 1), max(homeScore)
+  FROM Game
+  GROUP BY year
+  ORDER BY year DESC;
 
 -- sum of all stats by year
-SELECT 
-  year, 
-  ROUND(avg(PTS)::numeric, 1) AS PTS,
-  ROUND(avg(ThreePTM / GP)::numeric, 1) AS ThreePTM,
-  ROUND(avg(FTM / GP)::numeric, 1) AS FTM,
-  ROUND(avg(AST)::numeric, 1) AS AST,
-  ROUND(avg(REB)::numeric, 1) AS REB,
-  ROUND(avg(STL)::numeric, 1) AS STL,
-  ROUND(avg(BLK)::numeric, 1) AS BLK,
-  ROUND(avg(TOV)::numeric, 1) AS TOV
-FROM Player
-GROUP BY year
-ORDER BY year DESC;
+CREATE VIEW Average_Player_Stats AS
+  SELECT 
+    year, 
+    ROUND(avg(PTS)::numeric, 1) AS PTS,
+    ROUND(avg(ThreePTM / GP)::numeric, 1) AS ThreePTM,
+    ROUND(avg(FTM / GP)::numeric, 1) AS FTM,
+    ROUND(avg(AST)::numeric, 1) AS AST,
+    ROUND(avg(REB)::numeric, 1) AS REB,
+    ROUND(avg(STL)::numeric, 1) AS STL,
+    ROUND(avg(BLK)::numeric, 1) AS BLK,
+    ROUND(avg(TOV)::numeric, 1) AS TOV
+  FROM Player
+  GROUP BY year
+  ORDER BY year DESC;
 
 -- winning and losing teams fg%, 3pt% (regular season and playoff)
 SELECT year, teamName, home_wins + away_wins AS wins FROM
@@ -139,60 +151,34 @@ ORDER BY year, wins DESC;
 
 -----------------------------------------------------------------------------------------------------
 
--- number of fouls per season
-SELECT year, sum(PF * GP) 
-FROM Player 
-GROUP BY year 
-ORDER BY year ASC;
---   year   |  sum
--- ---------+-------
---  2011-12 | 38742
---  2012-13 | 48686
---  2013-14 | 50892
---  2014-15 | 49791
---  2015-16 | 49785
---  2016-17 | 48979
---  2017-18 | 48804
---  2018-19 | 51377
---  2019-20 | 43986
---  2020-21 | 41661
+-- number of fouls per season, per player
+CREATE VIEW PF_Stats AS
+  SELECT year, ROUND(sum(PF * GP)::numeric, 0), ROUND(avg(PF)::numeric, 2) as avg_pf
+  FROM Player 
+  GROUP BY year 
+  ORDER BY year ASC;
 
--- fouls per Game for the average player
-SELECT year, ROUND(avg(PF)::numeric, 1) as avg_pf
-FROM Player
-GROUP BY year
-ORDER BY year DESC;
-
--- fta per game
-SELECT year, sum(FTA) FROM Player
-GROUP BY year
-ORDER BY year ASC;
---   year   |  sum
--- ---------+-------
---  2011-12 | 44472
---  2012-13 | 54533
---  2013-14 | 58029
---  2014-15 | 56198
---  2015-16 | 57469
---  2016-17 | 56855
---  2017-18 | 53325
---  2018-19 | 56758
---  2019-20 | 48943
---  2020-21 | 47135
+-- fta per game, per player per game
+CREATE VIEW FT_Stats AS
+  SELECT year, sum(FTA), ROUND(avg(CAST(FTA AS FLOAT) / CAST(GP AS FLOAT))::numeric, 2) as avg_fta
+  FROM Player
+  GROUP BY year
+  ORDER BY year ASC;
 
 -- percentages of clutch shots in tight games compared to average
-SELECT year, fg_pct, clutch_fg_pct FROM
-  (SELECT year, ROUND((CAST(sum(shotResult::integer) AS FLOAT) / CAST(count(*) AS FLOAT))::numeric, 3) AS clutch_fg_pct
-  FROM Shot NATURAL JOIN (
-    SELECT * FROM Game
-    WHERE ABS(homeScore - awayScore) <= 6
-  ) g
-  GROUP BY year) sq1
-  
-  NATURAL JOIN
+CREATE VIEW Clutch_FG AS
+  SELECT year, fg_pct, clutch_fg_pct FROM
+    (SELECT year, ROUND((CAST(sum(shotResult::integer) AS FLOAT) / CAST(count(*) AS FLOAT))::numeric, 3) AS clutch_fg_pct
+    FROM Shot NATURAL JOIN (
+      SELECT * FROM Game
+      WHERE ABS(homeScore - awayScore) <= 6
+    ) g
+    GROUP BY year) sq1
+    
+    NATURAL JOIN
 
-  (SELECT year, ROUND((CAST(sum(shotResult::integer) AS FLOAT) / CAST(count(*) AS FLOAT))::numeric, 3) AS fg_pct
-  FROM Shot NATURAL JOIN Game
-  GROUP BY year) sq2;
+    (SELECT year, ROUND((CAST(sum(shotResult::integer) AS FLOAT) / CAST(count(*) AS FLOAT))::numeric, 3) AS fg_pct
+    FROM Shot NATURAL JOIN Game
+    GROUP BY year) sq2;
 
 -----------------------------------------------------------------------------------------------------
