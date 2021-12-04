@@ -136,20 +136,40 @@ CREATE VIEW Average_Player_Stats AS
   GROUP BY year
   ORDER BY year DESC;
 
--- winning and losing teams fg%, 3pt% (regular season and playoff)
+-- winning and losing teams
 CREATE VIEW Winning_Losing_FG AS
-  SELECT year, teamName, home_wins + away_wins AS wins FROM
-    (SELECT year, teamName, count(*) AS home_wins
-    FROM Game NATURAL JOIN Team
-    WHERE homeScore > awayScore
-    GROUP BY year, teamName) sq1
+  SELECT * 
+  FROM (
+    SELECT DISTINCT ON(1) year, teamName, home_wins + away_wins AS wins FROM
+      (SELECT year, teamName, count(*) AS home_wins
+      FROM Game NATURAL JOIN Team
+      WHERE homeScore > awayScore
+      GROUP BY year, teamName) sq1
 
-    NATURAL JOIN
+      NATURAL JOIN
 
-    (SELECT year, teamName, count(*) AS away_wins
-    FROM Game JOIN Team ON oppTeamID = Team.teamID
-    WHERE awayScore > homeScore
-    GROUP BY year, teamName) sq2
+      (SELECT year, teamName, count(*) AS away_wins
+      FROM Game JOIN Team ON oppTeamID = Team.teamID
+      WHERE awayScore > homeScore
+      GROUP BY year, teamName) sq2
+    ORDER BY year, wins DESC
+  ) winning
+  UNION 
+  (
+    SELECT DISTINCT ON(1) year, teamName, home_wins + away_wins AS wins FROM
+      (SELECT year, teamName, count(*) AS home_wins
+      FROM Game NATURAL JOIN Team
+      WHERE homeScore > awayScore
+      GROUP BY year, teamName) sq1
+
+      NATURAL JOIN
+
+      (SELECT year, teamName, count(*) AS away_wins
+      FROM Game JOIN Team ON oppTeamID = Team.teamID
+      WHERE awayScore > homeScore
+      GROUP BY year, teamName) sq2
+    ORDER BY year, wins ASC
+  )
   ORDER BY year, wins DESC;
 
 -- offensive, defensive rating by year

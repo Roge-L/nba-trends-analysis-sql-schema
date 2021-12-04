@@ -540,7 +540,7 @@ csc343h-lamroger=> SELECT * FROM Winning_Losing_FG;
  2020-21 | Houston Rockets        |   20
 (300 rows)
 
--------------------- Investigative Question 2: ------------------
+-------------------- Investigative Question 3: ------------------
 csc343h-lamroger=> SELECT * FROM PF_Stats;
   year   | round | avg_pf 
 ---------+-------+--------
