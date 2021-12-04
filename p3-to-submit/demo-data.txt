@@ -1,11 +1,23 @@
 --- (a) Load schema and data ---------------------------------------------
 -----
-csc343h-lamroger=> \i schema.ddl
-psql:schema.ddl:1: NOTICE:  drop cascades to 4 other objects
+csc343h-lamroger=> \i schema.ddl 
+psql:schema.ddl:1: NOTICE:  drop cascades to 16 other objects
 DETAIL:  drop cascades to table phasetwo.team
 drop cascades to table phasetwo.game
 drop cascades to table phasetwo.player
 drop cascades to table phasetwo.shot
+drop cascades to view phasetwo.fg_threes
+drop cascades to view phasetwo.fg_twos
+drop cascades to view phasetwo.fg_proportions
+drop cascades to view phasetwo.shot_freq_latest
+drop cascades to view phasetwo.shot_freq_earliest
+drop cascades to view phasetwo.top_5_scorers
+drop cascades to view phasetwo.game_scores
+drop cascades to view phasetwo.average_player_stats
+drop cascades to view phasetwo.winning_losing_fg
+drop cascades to view phasetwo.pf_stats
+drop cascades to view phasetwo.ft_stats
+drop cascades to view phasetwo.clutch_fg
 DROP SCHEMA
 CREATE SCHEMA
 SET
@@ -21,8 +33,7 @@ CREATE TABLE
 CREATE TABLE
 CREATE TABLE
 CREATE TABLE
-csc343h-lamroger=> 
-csc343h-lamroger=> \i data/full-data.sql
+csc343h-lamroger=> \i data/full-data.sql 
 COPY 30
 COPY 13412
 COPY 5022

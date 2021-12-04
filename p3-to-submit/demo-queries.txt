@@ -1,0 +1,587 @@
+-------------------- Loading schema, data, and views: -------------------- 
+csc343h-lamroger=> \i schema.ddl 
+psql:schema.ddl:1: NOTICE:  drop cascades to 4 other objects
+DETAIL:  drop cascades to table phasetwo.team
+drop cascades to table phasetwo.game
+drop cascades to table phasetwo.player
+drop cascades to table phasetwo.shot
+DROP SCHEMA
+CREATE SCHEMA
+SET
+psql:schema.ddl:5: NOTICE:  table "player" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:6: NOTICE:  table "team" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:7: NOTICE:  table "shot" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:8: NOTICE:  table "game" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+csc343h-lamroger=> \i data/full-data.sql 
+COPY 30
+COPY 13412
+COPY 5022
+COPY 383691
+COPY 364790
+COPY 297530
+COPY 335304
+COPY 576547
+csc343h-lamroger=> \i queries.sql 
+psql:queries.sql:1: NOTICE:  view "fg_threes" does not exist, skipping
+DROP VIEW
+psql:queries.sql:2: NOTICE:  view "fg_twos" does not exist, skipping
+DROP VIEW
+psql:queries.sql:3: NOTICE:  view "fg_proportions" does not exist, skipping
+DROP VIEW
+psql:queries.sql:4: NOTICE:  view "shot_freq_latest" does not exist, skipping
+DROP VIEW
+psql:queries.sql:5: NOTICE:  view "shot_freq_earliest" does not exist, skipping
+DROP VIEW
+psql:queries.sql:7: NOTICE:  view "top_5_scorers" does not exist, skipping
+DROP VIEW
+psql:queries.sql:8: NOTICE:  view "game_scores" does not exist, skipping
+DROP VIEW
+psql:queries.sql:9: NOTICE:  view "average_player_stats" does not exist, skipping
+DROP VIEW
+psql:queries.sql:10: NOTICE:  view "winning_losing_fg" does not exist, skipping
+DROP VIEW
+psql:queries.sql:12: NOTICE:  view "pf_stats" does not exist, skipping
+DROP VIEW
+psql:queries.sql:13: NOTICE:  view "fta" does not exist, skipping
+DROP VIEW
+psql:queries.sql:14: NOTICE:  view "clutch_fg" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+
+
+
+-------------------- Investigative Question 1: ------------------ 
+csc343h-lamroger=> SELECT * FROM FG_Threes;
+  year   | threes_attempted | threes_made | threes_fg_pct 
+---------+------------------+-------------+---------------
+ 2020-21 |           322142 |      113895 |         0.354
+ 2019-20 |           347252 |      122745 |         0.353
+ 2018-19 |           373824 |      132268 |         0.354
+ 2017-18 |           374841 |      132243 |         0.353
+ 2016-17 |           372894 |      131819 |         0.354
+ 2015-16 |           358630 |      126558 |         0.353
+ 2014-15 |           343314 |      121191 |         0.353
+ 2013-14 |           314183 |      110944 |         0.353
+ 2012-13 |           285057 |      100702 |         0.353
+ 2011-12 |           243970 |       86296 |         0.354
+(10 rows)
+
+csc343h-lamroger=> SELECT * FROM FG_Twos;
+  year   | twos_attempted | twos_made | twos_fg_pct 
+---------+----------------+-----------+-------------
+ 2020-21 |         934237 |    467405 |       0.500
+ 2019-20 |         992986 |    494492 |       0.498
+ 2018-19 |        1116006 |    554844 |       0.497
+ 2017-18 |        1159613 |    574662 |       0.496
+ 2016-17 |        1180258 |    582578 |       0.494
+ 2015-16 |        1179269 |    580702 |       0.492
+ 2014-15 |        1139168 |    558291 |       0.490
+ 2013-14 |        1055952 |    516345 |       0.489
+ 2012-13 |         977055 |    475560 |       0.487
+ 2011-12 |         857233 |    417068 |       0.487
+(10 rows)
+
+csc343h-lamroger=> SELECT * FROM FG_Proportions;
+  year   | proportion_threes | proportion_twos 
+---------+-------------------+-----------------
+ 2020-21 |             0.256 |           0.744
+ 2019-20 |             0.259 |           0.741
+ 2018-19 |             0.251 |           0.749
+ 2017-18 |             0.244 |           0.756
+ 2016-17 |             0.240 |           0.760
+ 2015-16 |             0.233 |           0.767
+ 2014-15 |             0.232 |           0.768
+ 2013-14 |             0.229 |           0.771
+ 2012-13 |             0.226 |           0.774
+ 2011-12 |             0.222 |           0.778
+(10 rows)
+
+csc343h-lamroger=> SELECT * FROM Shot_Freq_Latest;
+distance_ft | count  
+-------------+--------
+           0 | 264275
+           2 | 146514
+           4 |  63897
+           6 |  53430
+           8 |  43674
+          10 |  40265
+          12 |  40788
+          14 |  46442
+          16 |  55549
+          18 |  55689
+          20 |  33943
+          22 |  89771
+          24 | 206602
+          26 |  92850
+          28 |  14433
+          30 |   2937
+          32 |   1023
+          34 |    497
+          36 |    328
+          38 |    317
+          40 |    368
+(21 rows)
+
+csc343h-lamroger=> SELECT * FROM Shot_Freq_Earliest;
+ distance_ft | count  
+-------------+--------
+           0 | 218174
+           2 | 121636
+           4 |  55291
+           6 |  48366
+           8 |  39151
+          10 |  35285
+          12 |  37697
+          14 |  49649
+          16 |  67128
+          18 |  69524
+          20 |  41869
+          22 |  73463
+          24 | 170914
+          26 |  59322
+          28 |   7714
+          30 |   1607
+          32 |    604
+          34 |    345
+          36 |    263
+          38 |    355
+          40 |    390
+(21 rows)
+
+
+
+-------------------- Investigative Question 2: ------------------ 
+csc343h-lamroger=> SELECT * FROM Top_5_Scorers;
+      playername       |  year   | pts  | threepta | fga  | round 
+-----------------------+---------+------+----------+------+-------
+ Kevin Durant          | 2011-12 |   28 |      344 | 1297 | 0.265
+ Kobe Bryant           | 2011-12 | 27.9 |      287 | 1336 | 0.215
+ LeBron James          | 2011-12 | 27.1 |      149 | 1169 | 0.127
+ Carmelo Anthony       | 2012-13 | 28.7 |      414 | 1489 | 0.278
+ Kevin Durant          | 2012-13 | 28.1 |      334 | 1433 | 0.233
+ Kobe Bryant           | 2012-13 | 27.3 |      407 | 1595 | 0.255
+ Kevin Durant          | 2013-14 |   32 |      491 | 1688 | 0.291
+ Carmelo Anthony       | 2013-14 | 27.4 |      415 | 1643 | 0.253
+ LeBron James          | 2013-14 | 27.1 |      306 | 1353 | 0.226
+ Russell Westbrook     | 2014-15 | 28.1 |      288 | 1471 | 0.196
+ James Harden          | 2014-15 | 27.4 |      555 | 1470 | 0.378
+ Kevin Durant          | 2014-15 | 25.4 |      159 |  467 | 0.340
+ Stephen Curry         | 2015-16 | 30.1 |      886 | 1598 | 0.554
+ James Harden          | 2015-16 |   29 |      657 | 1617 | 0.406
+ Kevin Durant          | 2015-16 | 28.2 |      481 | 1381 | 0.348
+ Russell Westbrook     | 2016-17 | 31.6 |      583 | 1941 | 0.300
+ James Harden          | 2016-17 | 29.1 |      756 | 1533 | 0.493
+ Isaiah Thomas         | 2016-17 | 28.9 |      646 | 1473 | 0.439
+ James Harden          | 2017-18 | 30.4 |      722 | 1449 | 0.498
+ Anthony Davis         | 2017-18 | 28.1 |      162 | 1462 | 0.111
+ LeBron James          | 2017-18 | 27.5 |      406 | 1580 | 0.257
+ James Harden          | 2018-19 | 36.1 |     1028 | 1909 | 0.539
+ Paul George           | 2018-19 |   28 |      757 | 1614 | 0.469
+ Giannis Antetokounmpo | 2018-19 | 27.7 |      203 | 1247 | 0.163
+ James Harden          | 2019-20 | 34.3 |      843 | 1514 | 0.557
+ Bradley Beal          | 2019-20 | 30.5 |      481 | 1303 | 0.369
+ Damian Lillard        | 2019-20 |   30 |      674 | 1349 | 0.500
+ Stephen Curry         | 2020-21 |   32 |      801 | 1365 | 0.587
+ Bradley Beal          | 2020-21 | 31.3 |      373 | 1382 | 0.270
+ Damian Lillard        | 2020-21 | 28.8 |      704 | 1334 | 0.528
+(30 rows)
+
+csc343h-lamroger=> SELECT * FROM Game_Scores;
+  year   | min | round | max 
+---------+-----+-------+-----
+ 2020-21 |  73 | 112.4 | 154
+ 2019-20 |  68 | 112.3 | 158
+ 2018-19 |  77 | 112.3 | 161
+ 2017-18 |  69 | 107.2 | 149
+ 2016-17 |  64 | 106.9 | 149
+ 2015-16 |  68 | 103.7 | 144
+ 2014-15 |  65 | 101.1 | 143
+ 2013-14 |  63 | 101.7 | 143
+ 2012-13 |  62 |  99.4 | 142
+ 2011-12 |  59 |  97.4 | 149
+(10 rows)
+
+csc343h-lamroger=> SELECT * FROM Average_Player_Stats;
+  year   | pts | threeptm | ftm | ast | reb | stl | blk | tov 
+---------+-----+----------+-----+-----+-----+-----+-----+-----
+ 2020-21 | 8.9 |      0.6 | 0.9 | 2.0 | 3.6 | 0.6 | 0.4 | 1.1
+ 2019-20 | 8.7 |      0.6 | 0.9 | 1.9 | 3.6 | 0.6 | 0.4 | 1.1
+ 2018-19 | 8.6 |      0.5 | 0.9 | 1.9 | 3.6 | 0.6 | 0.4 | 1.1
+ 2017-18 | 8.2 |      0.5 | 0.8 | 1.8 | 3.4 | 0.6 | 0.4 | 1.1
+ 2016-17 | 8.4 |      0.4 | 1.0 | 1.8 | 3.6 | 0.6 | 0.4 | 1.1
+ 2015-16 | 8.3 |      0.4 | 1.0 | 1.8 | 3.6 | 0.7 | 0.4 | 1.1
+ 2014-15 | 8.1 |      0.3 | 0.9 | 1.8 | 3.5 | 0.6 | 0.4 | 1.2
+ 2013-14 | 8.1 |      0.3 | 1.0 | 1.8 | 3.5 | 0.6 | 0.4 | 1.2
+ 2012-13 | 8.0 |      0.3 | 0.9 | 1.8 | 3.5 | 0.6 | 0.4 | 1.2
+ 2011-12 | 7.9 |      0.3 | 1.0 | 1.7 | 3.6 | 0.7 | 0.4 | 1.2
+(10 rows)
+
+csc343h-lamroger=> SELECT * FROM Winning_Losing_FG;
+  year   |        teamname        | wins 
+---------+------------------------+------
+ 2011-12 | Miami Heat             |   63
+ 2011-12 | Oklahoma City Thunder  |   62
+ 2011-12 | San Antonio Spurs      |   61
+ 2011-12 | Chicago Bulls          |   54
+ 2011-12 | Boston Celtics         |   52
+ 2011-12 | Indiana Pacers         |   48
+ 2011-12 | Los Angeles Clippers   |   46
+ 2011-12 | Los Angeles Lakers     |   46
+ 2011-12 | Memphis Grizzlies      |   44
+ 2011-12 | Philadelphia 76ers     |   44
+ 2011-12 | Atlanta Hawks          |   43
+ 2011-12 | Denver Nuggets         |   43
+ 2011-12 | Orlando Magic          |   39
+ 2011-12 | New York Knicks        |   39
+ 2011-12 | Utah Jazz              |   37
+ 2011-12 | Dallas Mavericks       |   36
+ 2011-12 | Houston Rockets        |   35
+ 2011-12 | Phoenix Suns           |   33
+ 2011-12 | Milwaukee Bucks        |   31
+ 2011-12 | Portland Trail Blazers |   29
+ 2011-12 | Minnesota Timberwolves |   28
+ 2011-12 | Detroit Pistons        |   26
+ 2011-12 | Golden State Warriors  |   24
+ 2011-12 | Sacramento Kings       |   23
+ 2011-12 | New Orleans Pelicans   |   23
+ 2011-12 | Toronto Raptors        |   23
+ 2011-12 | Cleveland Cavaliers    |   22
+ 2011-12 | Brooklyn Nets          |   22
+ 2011-12 | Washington Wizards     |   20
+ 2011-12 | Charlotte Hornets      |    8
+ 2012-13 | Miami Heat             |   86
+ 2012-13 | San Antonio Spurs      |   76
+ 2012-13 | Oklahoma City Thunder  |   69
+ 2012-13 | Memphis Grizzlies      |   67
+ 2012-13 | Indiana Pacers         |   64
+ 2012-13 | Los Angeles Clippers   |   63
+ 2012-13 | New York Knicks        |   63
+ 2012-13 | Denver Nuggets         |   62
+ 2012-13 | Golden State Warriors  |   58
+ 2012-13 | Brooklyn Nets          |   55
+ 2012-13 | Chicago Bulls          |   55
+ 2012-13 | Houston Rockets        |   52
+ 2012-13 | Atlanta Hawks          |   49
+ 2012-13 | Utah Jazz              |   48
+ 2012-13 | Boston Celtics         |   45
+ 2012-13 | Los Angeles Lakers     |   45
+ 2012-13 | Dallas Mavericks       |   44
+ 2012-13 | Milwaukee Bucks        |   41
+ 2012-13 | Philadelphia 76ers     |   40
+ 2012-13 | Toronto Raptors        |   39
+ 2012-13 | Portland Trail Blazers |   36
+ 2012-13 | Minnesota Timberwolves |   35
+ 2012-13 | Detroit Pistons        |   33
+ 2012-13 | Sacramento Kings       |   33
+ 2012-13 | Washington Wizards     |   32
+ 2012-13 | New Orleans Pelicans   |   31
+ 2012-13 | Phoenix Suns           |   29
+ 2012-13 | Cleveland Cavaliers    |   26
+ 2012-13 | Charlotte Hornets      |   22
+ 2012-13 | Orlando Magic          |   22
+ 2013-14 | San Antonio Spurs      |   80
+ 2013-14 | Miami Heat             |   72
+ 2013-14 | Oklahoma City Thunder  |   72
+ 2013-14 | Indiana Pacers         |   69
+ 2013-14 | Los Angeles Clippers   |   68
+ 2013-14 | Portland Trail Blazers |   64
+ 2013-14 | Houston Rockets        |   62
+ 2013-14 | Chicago Bulls          |   57
+ 2013-14 | Toronto Raptors        |   57
+ 2013-14 | Golden State Warriors  |   57
+ 2013-14 | Dallas Mavericks       |   56
+ 2013-14 | Memphis Grizzlies      |   56
+ 2013-14 | Brooklyn Nets          |   54
+ 2013-14 | Phoenix Suns           |   52
+ 2013-14 | Washington Wizards     |   52
+ 2013-14 | Charlotte Hornets      |   48
+ 2013-14 | Minnesota Timberwolves |   44
+ 2013-14 | Atlanta Hawks          |   42
+ 2013-14 | New Orleans Pelicans   |   41
+ 2013-14 | New York Knicks        |   39
+ 2013-14 | Denver Nuggets         |   38
+ 2013-14 | Cleveland Cavaliers    |   37
+ 2013-14 | Sacramento Kings       |   33
+ 2013-14 | Detroit Pistons        |   32
+ 2013-14 | Los Angeles Lakers     |   31
+ 2013-14 | Boston Celtics         |   27
+ 2013-14 | Utah Jazz              |   26
+ 2013-14 | Orlando Magic          |   25
+ 2013-14 | Philadelphia 76ers     |   20
+ 2013-14 | Milwaukee Bucks        |   16
+ 2014-15 | Golden State Warriors  |   89
+ 2014-15 | Atlanta Hawks          |   72
+ 2014-15 | Cleveland Cavaliers    |   71
+ 2014-15 | Houston Rockets        |   71
+ 2014-15 | Los Angeles Clippers   |   65
+ 2014-15 | Memphis Grizzlies      |   63
+ 2014-15 | Chicago Bulls          |   60
+ 2014-15 | San Antonio Spurs      |   59
+ 2014-15 | Portland Trail Blazers |   55
+ 2014-15 | Toronto Raptors        |   55
+ 2014-15 | Washington Wizards     |   55
+ 2014-15 | Dallas Mavericks       |   55
+ 2014-15 | New Orleans Pelicans   |   50
+ 2014-15 | Oklahoma City Thunder  |   47
+ 2014-15 | Milwaukee Bucks        |   46
+ 2014-15 | Boston Celtics         |   45
+ 2014-15 | Phoenix Suns           |   43
+ 2014-15 | Brooklyn Nets          |   43
+ 2014-15 | Utah Jazz              |   43
+ 2014-15 | Indiana Pacers         |   41
+ 2014-15 | Miami Heat             |   41
+ 2014-15 | Detroit Pistons        |   37
+ 2014-15 | Charlotte Hornets      |   36
+ 2014-15 | Denver Nuggets         |   32
+ 2014-15 | Sacramento Kings       |   31
+ 2014-15 | Orlando Magic          |   28
+ 2014-15 | Los Angeles Lakers     |   24
+ 2014-15 | Minnesota Timberwolves |   21
+ 2014-15 | New York Knicks        |   20
+ 2014-15 | Philadelphia 76ers     |   20
+ 2015-16 | Golden State Warriors  |   91
+ 2015-16 | San Antonio Spurs      |   75
+ 2015-16 | Cleveland Cavaliers    |   74
+ 2015-16 | Toronto Raptors        |   71
+ 2015-16 | Oklahoma City Thunder  |   70
+ 2015-16 | Miami Heat             |   59
+ 2015-16 | Los Angeles Clippers   |   58
+ 2015-16 | Charlotte Hornets      |   58
+ 2015-16 | Atlanta Hawks          |   56
+ 2015-16 | Boston Celtics         |   54
+ 2015-16 | Indiana Pacers         |   53
+ 2015-16 | Portland Trail Blazers |   52
+ 2015-16 | Memphis Grizzlies      |   47
+ 2015-16 | Detroit Pistons        |   47
+ 2015-16 | Chicago Bulls          |   46
+ 2015-16 | Houston Rockets        |   45
+ 2015-16 | Washington Wizards     |   44
+ 2015-16 | Utah Jazz              |   43
+ 2015-16 | Dallas Mavericks       |   43
+ 2015-16 | Orlando Magic          |   40
+ 2015-16 | Sacramento Kings       |   38
+ 2015-16 | Denver Nuggets         |   37
+ 2015-16 | Milwaukee Bucks        |   35
+ 2015-16 | New York Knicks        |   35
+ 2015-16 | New Orleans Pelicans   |   33
+ 2015-16 | Minnesota Timberwolves |   31
+ 2015-16 | Phoenix Suns           |   27
+ 2015-16 | Brooklyn Nets          |   23
+ 2015-16 | Los Angeles Lakers     |   19
+ 2015-16 | Philadelphia 76ers     |   12
+ 2016-17 | Golden State Warriors  |   89
+ 2016-17 | San Antonio Spurs      |   73
+ 2016-17 | Boston Celtics         |   67
+ 2016-17 | Cleveland Cavaliers    |   66
+ 2016-17 | Houston Rockets        |   65
+ 2016-17 | Washington Wizards     |   60
+ 2016-17 | Utah Jazz              |   58
+ 2016-17 | Toronto Raptors        |   58
+ 2016-17 | Los Angeles Clippers   |   57
+ 2016-17 | Atlanta Hawks          |   50
+ 2016-17 | Oklahoma City Thunder  |   50
+ 2016-17 | Memphis Grizzlies      |   49
+ 2016-17 | Milwaukee Bucks        |   47
+ 2016-17 | Chicago Bulls          |   46
+ 2016-17 | Miami Heat             |   45
+ 2016-17 | Indiana Pacers         |   45
+ 2016-17 | Portland Trail Blazers |   45
+ 2016-17 | Denver Nuggets         |   44
+ 2016-17 | Detroit Pistons        |   40
+ 2016-17 | Charlotte Hornets      |   39
+ 2016-17 | Minnesota Timberwolves |   36
+ 2016-17 | New York Knicks        |   35
+ 2016-17 | New Orleans Pelicans   |   35
+ 2016-17 | Dallas Mavericks       |   35
+ 2016-17 | Sacramento Kings       |   34
+ 2016-17 | Orlando Magic          |   31
+ 2016-17 | Philadelphia 76ers     |   30
+ 2016-17 | Phoenix Suns           |   28
+ 2016-17 | Los Angeles Lakers     |   28
+ 2016-17 | Brooklyn Nets          |   21
+ 2017-18 | Houston Rockets        |   79
+ 2017-18 | Golden State Warriors  |   76
+ 2017-18 | Boston Celtics         |   70
+ 2017-18 | Toronto Raptors        |   66
+ 2017-18 | Cleveland Cavaliers    |   63
+ 2017-18 | Philadelphia 76ers     |   59
+ 2017-18 | Utah Jazz              |   56
+ 2017-18 | New Orleans Pelicans   |   54
+ 2017-18 | Indiana Pacers         |   53
+ 2017-18 | Portland Trail Blazers |   53
+ 2017-18 | Oklahoma City Thunder  |   52
+ 2017-18 | San Antonio Spurs      |   51
+ 2017-18 | Minnesota Timberwolves |   50
+ 2017-18 | Denver Nuggets         |   49
+ 2017-18 | Washington Wizards     |   48
+ 2017-18 | Milwaukee Bucks        |   48
+ 2017-18 | Miami Heat             |   48
+ 2017-18 | Los Angeles Clippers   |   44
+ 2017-18 | Detroit Pistons        |   41
+ 2017-18 | Charlotte Hornets      |   38
+ 2017-18 | Los Angeles Lakers     |   37
+ 2017-18 | Brooklyn Nets          |   31
+ 2017-18 | Chicago Bulls          |   30
+ 2017-18 | New York Knicks        |   29
+ 2017-18 | Sacramento Kings       |   28
+ 2017-18 | Orlando Magic          |   28
+ 2017-18 | Dallas Mavericks       |   28
+ 2017-18 | Atlanta Hawks          |   26
+ 2017-18 | Memphis Grizzlies      |   25
+ 2017-18 | Phoenix Suns           |   22
+ 2018-19 | Toronto Raptors        |   77
+ 2018-19 | Milwaukee Bucks        |   73
+ 2018-19 | Golden State Warriors  |   72
+ 2018-19 | Denver Nuggets         |   64
+ 2018-19 | Portland Trail Blazers |   64
+ 2018-19 | Houston Rockets        |   62
+ 2018-19 | Philadelphia 76ers     |   60
+ 2018-19 | Boston Celtics         |   55
+ 2018-19 | Utah Jazz              |   54
+ 2018-19 | San Antonio Spurs      |   54
+ 2018-19 | Los Angeles Clippers   |   53
+ 2018-19 | Oklahoma City Thunder  |   53
+ 2018-19 | Indiana Pacers         |   50
+ 2018-19 | Brooklyn Nets          |   45
+ 2018-19 | Orlando Magic          |   44
+ 2018-19 | Detroit Pistons        |   43
+ 2018-19 | Charlotte Hornets      |   43
+ 2018-19 | Miami Heat             |   42
+ 2018-19 | Sacramento Kings       |   40
+ 2018-19 | Los Angeles Lakers     |   40
+ 2018-19 | Minnesota Timberwolves |   37
+ 2018-19 | Memphis Grizzlies      |   35
+ 2018-19 | Washington Wizards     |   35
+ 2018-19 | Dallas Mavericks       |   34
+ 2018-19 | New Orleans Pelicans   |   33
+ 2018-19 | Atlanta Hawks          |   31
+ 2018-19 | Chicago Bulls          |   24
+ 2018-19 | Cleveland Cavaliers    |   21
+ 2018-19 | Phoenix Suns           |   20
+ 2018-19 | New York Knicks        |   20
+ 2019-20 | Los Angeles Lakers     |   73
+ 2019-20 | Milwaukee Bucks        |   68
+ 2019-20 | Toronto Raptors        |   64
+ 2019-20 | Miami Heat             |   63
+ 2019-20 | Boston Celtics         |   63
+ 2019-20 | Denver Nuggets         |   60
+ 2019-20 | Los Angeles Clippers   |   58
+ 2019-20 | Houston Rockets        |   54
+ 2019-20 | Oklahoma City Thunder  |   51
+ 2019-20 | Indiana Pacers         |   50
+ 2019-20 | Utah Jazz              |   49
+ 2019-20 | Dallas Mavericks       |   49
+ 2019-20 | Philadelphia 76ers     |   47
+ 2019-20 | Phoenix Suns           |   38
+ 2019-20 | Orlando Magic          |   38
+ 2019-20 | Portland Trail Blazers |   38
+ 2019-20 | New Orleans Pelicans   |   38
+ 2019-20 | Brooklyn Nets          |   38
+ 2019-20 | Memphis Grizzlies      |   36
+ 2019-20 | San Antonio Spurs      |   35
+ 2019-20 | Sacramento Kings       |   34
+ 2019-20 | Washington Wizards     |   27
+ 2019-20 | Chicago Bulls          |   24
+ 2019-20 | Charlotte Hornets      |   24
+ 2019-20 | Detroit Pistons        |   23
+ 2019-20 | New York Knicks        |   22
+ 2019-20 | Atlanta Hawks          |   21
+ 2019-20 | Minnesota Timberwolves |   20
+ 2019-20 | Cleveland Cavaliers    |   19
+ 2019-20 | Golden State Warriors  |   17
+ 2020-21 | Phoenix Suns           |   65
+ 2020-21 | Milwaukee Bucks        |   62
+ 2020-21 | Utah Jazz              |   61
+ 2020-21 | Philadelphia 76ers     |   58
+ 2020-21 | Brooklyn Nets          |   57
+ 2020-21 | Los Angeles Clippers   |   57
+ 2020-21 | Atlanta Hawks          |   53
+ 2020-21 | Denver Nuggets         |   53
+ 2020-21 | Los Angeles Lakers     |   49
+ 2020-21 | Dallas Mavericks       |   47
+ 2020-21 | Portland Trail Blazers |   45
+ 2020-21 | New York Knicks        |   45
+ 2020-21 | Memphis Grizzlies      |   44
+ 2020-21 | Golden State Warriors  |   41
+ 2020-21 | Miami Heat             |   41
+ 2020-21 | Boston Celtics         |   38
+ 2020-21 | Washington Wizards     |   37
+ 2020-21 | Indiana Pacers         |   35
+ 2020-21 | Chicago Bulls          |   34
+ 2020-21 | Charlotte Hornets      |   34
+ 2020-21 | Sacramento Kings       |   33
+ 2020-21 | San Antonio Spurs      |   33
+ 2020-21 | New Orleans Pelicans   |   33
+ 2020-21 | Toronto Raptors        |   29
+ 2020-21 | Cleveland Cavaliers    |   24
+ 2020-21 | Minnesota Timberwolves |   24
+ 2020-21 | Orlando Magic          |   23
+ 2020-21 | Oklahoma City Thunder  |   23
+ 2020-21 | Detroit Pistons        |   22
+ 2020-21 | Houston Rockets        |   20
+(300 rows)
+
+-------------------- Investigative Question 2: ------------------
+csc343h-lamroger=> SELECT * FROM PF_Stats;
+  year   | round | avg_pf 
+---------+-------+--------
+ 2011-12 | 38742 |   1.73
+ 2012-13 | 48686 |   1.71
+ 2013-14 | 50892 |   1.77
+ 2014-15 | 49791 |   1.73
+ 2015-16 | 49785 |   1.74
+ 2016-17 | 48979 |   1.68
+ 2017-18 | 48804 |   1.63
+ 2018-19 | 51377 |   1.73
+ 2019-20 | 43986 |   1.75
+ 2020-21 | 41661 |   1.63
+(10 rows)
+
+csc343h-lamroger=> SELECT * FROM FT_Stats;
+  year   |  sum  | avg_fta 
+---------+-------+---------
+ 2011-12 | 44472 |    1.87
+ 2012-13 | 54533 |    1.82
+ 2013-14 | 58029 |    1.87
+ 2014-15 | 56198 |    1.88
+ 2015-16 | 57469 |    1.91
+ 2016-17 | 56855 |    1.86
+ 2017-18 | 53325 |    1.67
+ 2018-19 | 56758 |    1.79
+ 2019-20 | 48943 |    1.81
+ 2020-21 | 47135 |    1.76
+(10 rows)
+
+csc343h-lamroger=> SELECT * FROM Clutch_FG;
+  year   | fg_pct | clutch_fg_pct 
+---------+--------+---------------
+ 2011-12 |  0.449 |         0.444
+ 2012-13 |  0.453 |         0.449
+ 2013-14 |  0.455 |         0.452
+ 2014-15 |  0.450 |         0.447
+ 2015-16 |  0.453 |         0.451
+ 2016-17 |  0.458 |         0.454
+ 2017-18 |  0.461 |         0.456
+ 2018-19 |  0.461 |         0.460
+ 2019-20 |  0.461 |         0.461
+ 2020-21 |  0.467 |         0.467
+(10 rows)

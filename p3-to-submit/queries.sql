@@ -10,7 +10,7 @@ DROP VIEW IF EXISTS Average_Player_Stats CASCADE;
 DROP VIEW IF EXISTS Winning_Losing_FG CASCADE;
 
 DROP VIEW IF EXISTS PF_Stats CASCADE;
-DROP VIEW IF EXISTS FTA CASCADE;
+DROP VIEW IF EXISTS FT_Stats CASCADE;
 DROP VIEW IF EXISTS Clutch_FG CASCADE;
 
 
@@ -57,9 +57,8 @@ CREATE VIEW FG_Twos AS
   ORDER BY year DESC;
 
 -- amalgamate previous two queries, get proportion of twos and threes 
-CREATE VIEW FG_Proportions
-  SELECT 
-    year, 
+CREATE VIEW FG_Proportions AS
+  SELECT year, 
     ROUND((CAST(threes_attempted AS FLOAT) / CAST((threes_attempted + twos_attempted) AS FLOAT))::numeric, 3) AS proportion_threes,
     ROUND((CAST(twos_attempted AS FLOAT) / CAST((threes_attempted + twos_attempted) AS FLOAT))::numeric, 3) AS proportion_twos  
   FROM FG_Twos NATURAL JOIN FG_Threes
